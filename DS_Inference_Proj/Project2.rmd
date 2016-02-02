@@ -1,0 +1,74 @@
+---
+title: "Coursera_DS_Inference_Project2"
+author: "Atul"
+date: "January 31, 2016"
+output: html_document
+---
+
+LOAD THE ToothGrowth DataBase
+-----------------------------------
+```{r}
+library(datasets)
+data("ToothGrowth")
+```
+
+
+BASIC INFORMATION ABOUT THIS DATABASE
+---------------------------------------
+```{r}
+str(ToothGrowth)
+colnames(ToothGrowth)
+rownames(ToothGrowth)
+dim(ToothGrowth)
+summary(ToothGrowth)
+unique(ToothGrowth$dose)
+```
+
+
+EXPLORATORY DATA ANALYSIS
+--------------------------
+
+```{r}
+hist(ToothGrowth$len)
+boxplot(ToothGrowth$len)
+plot(ToothGrowth$dose, ToothGrowth$len)
+
+library(ggplot2)
+ggplot(data=ToothGrowth, aes(dose, len)) + geom_bar() + geom_point() + facet_wrap(~supp)
+```
+
+Above plots illustrate that length might be increasing with number of doses and supplements, which we validate in below testing
+
+HYPOTHESIS TESTING
+-------------------
+We check following null hypotheses
+
+1) There is no significant difference in length with supplements
+
+```{r}
+t.test(len ~ supp, paired = F, var.equal = F, data = ToothGrowth)
+```
+
+We can not reject NULL hypthesis with this confidence interval.
+
+2) There is no significant difference in length with dose
+
+```{r}
+# COMPARISON WITH 0.5 and 1.0
+ToothGrowth1 <- subset(ToothGrowth, ToothGrowth$dose %in% c(0.5,1.0))
+ToothGrowth2 <- subset(ToothGrowth, ToothGrowth$dose %in% c(1.0,2.0))
+ToothGrowth3 <- subset(ToothGrowth, ToothGrowth$dose %in% c(0.5,2.0))
+t.test(len ~ dose, paired = F, var.equal = F, data = ToothGrowth1)
+t.test(len ~ dose, paired = F, var.equal = F, data = ToothGrowth2)
+t.test(len ~ dose, paired = F, var.equal = F, data = ToothGrowth3)
+```
+
+High confidence for alternate hypothesis indicate that we can reject NULL hypothesis.
+
+We made some assumption while checking above hypothesis:-
+
+* There might be other variables affecting data, which is missing in given ToothGrowth dataset.
+* There might be mistake in collecting data.
+* There might be affect of one dose into others does, if same guinea pig is tries with all doses.
+* It might not blind-eyed test i.e. guinea pig might be aware of doses.
+* sample population might not be independent/random.
